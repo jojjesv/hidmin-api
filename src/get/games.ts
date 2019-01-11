@@ -17,16 +17,21 @@ export default async (req: Request, res: Response) => {
   }]).toArray();
 
   games = games.map(g => {
+    let entries = g.scoreEntries.map(entry => {
+      return {
+        id: entry._id,
+        score: entry.score,
+        name: entry.name,
+        date: entry.date
+      }
+    });
+
+    entries.sort((a: any, b: any) => b.score - a.score);
+
     return {
       title: g.title,
-      entries: g.scoreEntries.map(entry => {
-        return {
-          id: entry._id,
-          score: entry.score,
-          name: entry.name,
-          date: entry.date
-        }
-      })
+      secret: g.gameSecret,
+      entries
     }
   });
 

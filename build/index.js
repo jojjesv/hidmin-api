@@ -58,6 +58,7 @@ var baseApiUrl = "/api";
 app.all(baseApiUrl + "/games", function (req, res) { return handleWith405(req, res, 'get', require('./get/games').default); });
 app.all(baseApiUrl + "/game", function (req, res) { return handleWith405(req, res, 'post', require('./post/game').default); });
 app.all(baseApiUrl + "/game/token", function (req, res) { return handleWith405(req, res, 'post', require('./post/token').default); });
+app.all(baseApiUrl + "/games/:gameId", function (req, res) { return handleWith405(req, res, 'get', require('./get/entries').default); });
 app.all(baseApiUrl + "/score", function (req, res) { return handleMultipleWith405(req, res, {
     'post': require('./post/score').default
 }); });

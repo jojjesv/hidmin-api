@@ -65,6 +65,7 @@ const baseApiUrl = `/api`;
 app.all(`${baseApiUrl}/games`, (req, res) => handleWith405(req, res, 'get', require('./get/games').default));
 app.all(`${baseApiUrl}/game`, (req, res) => handleWith405(req, res, 'post', require('./post/game').default));
 app.all(`${baseApiUrl}/game/token`, (req, res) => handleWith405(req, res, 'post', require('./post/token').default));
+app.all(`${baseApiUrl}/games/:gameId`, (req, res) => handleWith405(req, res, 'get', require('./get/entries').default));
 app.all(`${baseApiUrl}/score`, (req, res) => handleMultipleWith405(req, res, {
   'post': require('./post/score').default
 }));

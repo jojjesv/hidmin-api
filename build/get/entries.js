@@ -34,48 +34,47 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var __1 = require("..");
 var constants_1 = require("../db/constants");
+var mongodb_1 = require("mongodb");
 /**
- * Outputs all games and their score entries.
+ * Outputs score entries for a specific game.
  * @author Johan Svensson
  */
-exports.default = (function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var games;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, __1.db().collection(constants_1.collections.games).aggregate([{
-                        $lookup: {
-                            from: constants_1.collections.scoreEntries,
-                            localField: '_id',
-                            foreignField: 'gameId',
-                            as: 'scoreEntries'
-                        }
-                    }]).toArray()];
-            case 1:
-                games = _a.sent();
-                games = games.map(function (g) {
-                    var entries = g.scoreEntries.map(function (entry) {
-                        return {
-                            id: entry._id,
-                            score: entry.score,
-                            name: entry.name,
-                            date: entry.date
-                        };
+function default_1(req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var params, gameId, gameMatch, entries;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    params = req.params;
+                    gameId = params.gameId;
+                    //  Convert to object ID
+                    try {
+                        gameId = new mongodb_1.ObjectID(gameId);
+                    }
+                    catch (e) {
+                        //  Silently fail
+                    }
+                    return [4 /*yield*/, __1.db().collection(constants_1.collections.games).findOne({ $or: [{ _id: gameId }, { gameSecret: gameId }] })];
+                case 1:
+                    gameMatch = _a.sent();
+                    if (!gameMatch) {
+                        return [2 /*return*/, res.status(400).end(JSON.stringify({
+                                result: 'error', error: "unknown game with id: " + gameId
+                            }))];
+                    }
+                    return [4 /*yield*/, __1.db().collection(constants_1.collections.scoreEntries).find({ gameId: gameId }).toArray()];
+                case 2:
+                    entries = _a.sent();
+                    entries.forEach(function (e) {
+                        e.id = e._id;
+                        delete e._id;
                     });
-                    entries.sort(function (a, b) { return b.score - a.score; });
-                    return {
-                        title: g.title,
-                        secret: g.gameSecret,
-                        entries: entries
-                    };
-                });
-                return [2 /*return*/, res.status(200).end(JSON.stringify({
-                        result: 'ok',
-                        games: games
-                    }))];
-        }
+                    return [2 /*return*/, res.json({ entries: entries })];
+            }
+        });
     });
-}); });
+}
+exports.default = default_1;
